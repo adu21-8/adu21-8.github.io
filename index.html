@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>adu21-8</title>
+<meta name="description" content="Projects by adu21-8: Aether, an offline MT5 trading journal, plus Orrery and Desktop Widgets.">
+<meta property="og:title" content="adu21-8">
+<meta property="og:description" content="Tools I wanted and couldn't find, built to run offline and keep your data on your device.">
+<meta property="og:image" content="https://adu21-8.github.io/assets/aether-dashboard.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: a trade statement. One narrow column; each project is a line item with a ticket, an open date and a status, like rows in an MT5 report. */
+  :root {
+    --bg: #f3f4f1;
+    --surface: #ffffff;
+    --fg: #15181a;
+    --muted: #61676b;
+    --line: #dcdfda;
+    --accent: #2f7d57;
+    --live: #2f7d57;
+    --live-bg: rgba(47,125,87,0.10);
+    --idle: #8a6a1f;
+    --idle-bg: rgba(138,106,31,0.10);
+    --font-display: "Geist", "Segoe UI", system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0d0f10; --surface: #151819; --fg: #e8ebe7; --muted: #8b9290; --line: #262b2b;
+      --accent: #79c79a; --live: #79c79a; --live-bg: rgba(121,199,154,0.12); --idle: #d8b46a; --idle-bg: rgba(216,180,106,0.12);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d0f10; --surface: #151819; --fg: #e8ebe7; --muted: #8b9290; --line: #262b2b;
+    --accent: #79c79a; --live: #79c79a; --live-bg: rgba(121,199,154,0.12); --idle: #d8b46a; --idle-bg: rgba(216,180,106,0.12);
+    color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 400 16px/1.6 var(--font-display);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  .wrap {
+    max-width: 860px; margin: 0 auto;
+    padding-left: max(20px, env(safe-area-inset-left, 0px));
+    padding-right: max(20px, env(safe-area-inset-right, 0px));
+    padding-block: calc(48px + env(safe-area-inset-top, 0px)) calc(40px + env(safe-area-inset-bottom, 0px));
+    display: grid; gap: 64px;
+  }
+  .mono { font-family: var(--font-mono); }
+  .eyebrow {
+    font: 500 12px/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+
+  /* intro */
+  .intro { display: grid; gap: 20px; }
+  .handle { display: flex; align-items: center; gap: 12px; font: 500 14px/1 var(--font-mono); color: var(--muted); }
+  .handle img { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); }
+  h1 {
+    margin: 0; font-weight: 800; font-size: clamp(36px, 7vw, 64px); line-height: 1.02; letter-spacing: -0.035em;
+    text-wrap: balance; max-width: 15ch;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { margin: 0; color: var(--muted); font-size: 18px; max-width: 56ch; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px 20px; font: 500 14px/1 var(--font-mono); }
+  .links a { text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+  .links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* statement */
+  .statement { display: grid; gap: 16px; }
+  .statement-head {
+    display: grid; grid-template-columns: 64px 1fr auto; gap: 16px; padding: 0 4px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .item {
+    display: grid; grid-template-columns: 64px 1fr; gap: 16px;
+    padding: 24px 4px 28px; border-bottom: 1px solid var(--line);
+  }
+  .ticket { font: 500 13px/1.9 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .body { display: grid; gap: 14px; min-width: 0; }
+  .row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+  h2 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+  .meta { display: flex; align-items: center; gap: 12px; font: 400 12px/1 var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .status { padding: 5px 8px; border-radius: 3px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; font-size: 11px; }
+  .status.live { color: var(--live); background: var(--live-bg); }
+  .status.idle { color: var(--idle); background: var(--idle-bg); }
+  .body p { margin: 0; max-width: 62ch; }
+  .facts { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--muted); font-size: 15px; }
+  .facts li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; }
+  .facts li::before { content: "–"; color: var(--accent); }
+  .shot {
+    display: block; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #0a0a0a;
+    max-width: 100%;
+  }
+  .shot img { display: block; width: 100%; height: auto; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { font: 400 12px/1 var(--font-mono); padding: 6px 8px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+    font: 500 14px/1 var(--font-display); padding: 11px 14px; border-radius: 4px;
+    border: 1px solid var(--line); background: var(--surface);
+  }
+  .btn:hover { border-color: var(--fg); }
+  .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .btn.primary:hover { opacity: 0.88; }
+
+  /* orrery preview tile */
+  .orrery-tile {
+    position: relative; display: block; aspect-ratio: 16 / 7; max-width: 100%;
+    border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: #0a0c19; text-decoration: none;
+  }
+  .orrery-tile canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .orrery-tile .play {
+    position: absolute; left: 16px; bottom: 14px; font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em;
+    text-transform: uppercase; color: #d6aa55;
+  }
+
+  .totals {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
+    padding: 16px 4px 0; font-variant-numeric: tabular-nums;
+  }
+  .totals div { display: grid; gap: 6px; }
+  .totals b { font: 500 22px/1 var(--font-mono); }
+
+  footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font: 400 13px/1.5 var(--font-mono); }
+
+  @media (max-width: 560px) {
+    .wrap { gap: 48px; }
+    .statement-head { grid-template-columns: 1fr auto; }
+    .statement-head .eyebrow:first-child { display: none; }
+    .item { grid-template-columns: 1fr; gap: 6px; }
+    h2 { font-size: 22px; }
+    .totals { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <section class="intro">
+    <div class="handle">
+      <img src="https://github.com/adu21-8.png?size=80" alt="" width="36" height="36">
+      <span>adu21-8</span>
+    </div>
+    <h1>I build the tools I wanted and <em>couldn't find.</em></h1>
+    <p class="lede">I trade and I build. Most of what I make is a single-file web app that works offline and keeps your data on your own device. No accounts, no servers, nothing to sign up for.</p>
+    <nav class="links" aria-label="Elsewhere">
+      <a href="https://github.com/adu21-8">GitHub</a>
+      <a href="https://aether-trade.netlify.app/">Aether web app</a>
+      <a href="#projects">Projects ↓</a>
+    </nav>
+  </section>
+
+  <section class="statement" id="projects" aria-labelledby="statement-title">
+    <div class="statement-head">
+      <span class="eyebrow">Ticket</span>
+      <span class="eyebrow" id="statement-title">Projects</span>
+      <span class="eyebrow">Status</span>
+    </div>
+
+    <article class="item">
+      <div class="ticket">#001</div>
+      <div class="body">
+        <div class="row">
+          <h2>Aether</h2>
+          <div class="meta"><span>opened 2026-08-12</span><span class="status live">Live</span></div>
+        </div>
+        <p>An offline trading journal for MetaTrader 5. Import your statement, tag what you did, and hold yourself to the risk rules you actually set. I built it because every journal I tried was either paid or sketchy with my data.</p>
+        <a class="shot" href="https://aether-trade.netlify.app/" aria-label="Open Aether">
+          <img src="assets/aether-dashboard.jpg" alt="Aether dashboard showing net P&amp;L, win rate, profit factor and a clear-to-trade banner, using sample data" width="800" height="502" loading="lazy">
+        </a>
+        <ul class="facts">
+          <li>Reads MT5 trade history reports straight from the export, including UTF-16 files</li>
+          <li>Rule engine flags every trade that breaks your per-trade, daily or weekly loss caps</li>
+          <li>Discipline-adjusted equity curve: your account if you had skipped every rule-breaking trade</li>
+          <li>R-multiple distribution, weekday × hour heatmap, drawdown episodes, journal and pre-trade checklist</li>
+        </ul>
+        <div class="tags"><span>HTML / CSS / JS</span><span>PWA</span><span>Offline-first</span><span>No dependencies</span></div>
+        <div class="actions">
+          <a class="btn primary" href="https://aether-trade.netlify.app/">Open the app</a>
+          <a class="btn" href="https://github.com/adu21-8/aether">Source</a>
+        </div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="ticket">#002</div>
+      <div class="body">
+        <div class="row">
+          <h2>Desktop Widgets</h2>
+          <div class="meta"><span>opened 2026-10-23</span><span class="status idle">Private</span></div>
+        </div>
+        <p>A transparent, click-through widget overlay for Windows that sits on top of a Wallpaper Engine wallpaper. Clock, CPU and GPU gauges, weather, an app launcher, now-playing controls, and one-click audio and resolution switching.</p>
+        <div class="tags"><span>Electron</span><span>PowerShell</span><span>Windows</span></div>
+      </div>
+    </article>
+
+    <article class="item">
+      <div class="ticket">#003</div>
+      <div class="body">
+        <div class="row">
+          <h2>Orrery</h2>
+          <div class="meta"><span>opened 2026-11-11</span><span class="status live">Playable</span></div>
+        </div>
+        <p>A solar system you can play. Each planet rings a note when it crosses the meridian, and orbit speeds follow Kepler's third law, so the rhythms drift and almost never repeat. Switch to resonant orbits to make them loop.</p>
+        <a class="orrery-tile" href="orrery/" aria-label="Open Orrery">
+          <canvas id="mini" aria-hidden="true"></canvas>
+          <span class="play">▶ Play Orrery</span>
+        </a>
+        <div class="tags"><span>Web Audio</span><span>Canvas</span><span>Generative music</span></div>
+      </div>
+    </article>
+
+    <div class="totals" aria-label="Summary">
+      <div><span class="eyebrow">Projects</span><b>3</b></div>
+      <div><span class="eyebrow">Live</span><b>2</b></div>
+      <div><span class="eyebrow">Accounts needed</span><b>0</b></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>adu21-8 · 2026</span>
+    <a href="https://github.com/adu21-8">github.com/adu21-8</a>
+  </footer>
+</main>
+
+<script>
+  // Small ambient preview of Orrery: planets orbiting, no sound.
+  (() => {
+    const c = document.getElementById('mini'); if (!c) return;
+    const ctx = c.getContext('2d');
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hues = ['#f4cd75','#f2a46c','#ea7a8c','#cf82d9','#9a8ff2','#6aaeea','#5ec8c0','#a5d68c'];
+    const planets = [[0,.1],[2,.55],[3,.3],[5,.8],[7,.05],[4,.7]].map(([r,p]) => ({ r, p }));
+    let w = 0, h = 0;
+    function size() {
+      const d = Math.min(devicePixelRatio || 1, 2), b = c.getBoundingClientRect();
+      w = b.width; h = b.height; c.width = w * d; c.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0);
+    }
+    let last = performance.now();
+    function tick(now) {
+      const dt = Math.min(0.1, (now - last) / 1000); last = now;
+      const cx = w * 0.62, cy = h * 0.5, max = h * 0.46, r0 = max * 0.2, gap = (max - r0) / 7;
+      ctx.fillStyle = '#0a0c19'; ctx.fillRect(0, 0, w, h);
+      for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.arc(cx, cy, r0 + i * gap, 0, 6.283); ctx.strokeStyle = 'rgba(214,170,85,0.16)'; ctx.lineWidth = 1; ctx.stroke(); }
+      ctx.strokeStyle = 'rgba(214,170,85,0.7)'; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - max - 6); ctx.stroke();
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r0 * 1.4); g.addColorStop(0, '#ffe7b0'); g.addColorStop(1, 'rgba(240,180,80,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r0 * 1.4, 0, 6.283); ctx.fill();
+      for (const pl of planets) {
+        if (!still) pl.p = (pl.p + dt / (2.4 * Math.pow(1 + pl.r * 0.45, 1.5))) % 1;
+        const a = -Math.PI / 2 + pl.p * 6.283, R = r0 + pl.r * gap;
+        ctx.fillStyle = hues[pl.r]; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * R, cy + Math.sin(a) * R, 3.5 + pl.r * 0.3, 0, 6.283); ctx.fill();
+      }
+      if (!still) requestAnimationFrame(tick);
+    }
+    size(); addEventListener('resize', () => { size(); if (still) tick(performance.now()); });
+    requestAnimationFrame(t => { last = t; tick(t); });
+  })();
+</script>
+</body>
+</html>
