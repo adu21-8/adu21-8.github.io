@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>adu21-8</title>
-<meta name="description" content="Projects by adu21-8: Aether, an offline MT5 trading journal, plus Orrery and Desktop Widgets.">
+<meta name="description" content="Projects by adu21-8, including Aether, an offline MT5 trading journal.">
 <meta property="og:title" content="adu21-8">
 <meta property="og:description" content="Tools I wanted and couldn't find, built to run offline and keep your data on your device.">
 <meta property="og:image" content="https://adu21-8.github.io/assets/aether-dashboard.jpg">
@@ -112,24 +112,6 @@
   .btn.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
   .btn.primary:hover { opacity: 0.88; }
 
-  /* orrery preview tile */
-  .orrery-tile {
-    position: relative; display: block; aspect-ratio: 16 / 7; max-width: 100%;
-    border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: #0a0c19; text-decoration: none;
-  }
-  .orrery-tile canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .orrery-tile .play {
-    position: absolute; left: 16px; bottom: 14px; font: 500 12px/1 var(--font-mono); letter-spacing: 0.08em;
-    text-transform: uppercase; color: #d6aa55;
-  }
-
-  .totals {
-    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;
-    padding: 16px 4px 0; font-variant-numeric: tabular-nums;
-  }
-  .totals div { display: grid; gap: 6px; }
-  .totals b { font: 500 22px/1 var(--font-mono); }
-
   footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--muted); font: 400 13px/1.5 var(--font-mono); }
 
   @media (max-width: 560px) {
@@ -138,7 +120,6 @@
     .statement-head .eyebrow:first-child { display: none; }
     .item { grid-template-columns: 1fr; gap: 6px; }
     h2 { font-size: 22px; }
-    .totals { grid-template-columns: 1fr 1fr; }
   }
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 </style>
@@ -152,7 +133,7 @@
       <span>adu21-8</span>
     </div>
     <h1>I build the tools I wanted and <em>couldn't find.</em></h1>
-    <p class="lede">I trade and I build. Most of what I make is a single-file web app that works offline and keeps your data on your own device. No accounts, no servers, nothing to sign up for.</p>
+    <p class="lede">I trade, and I build the tools I trade with. They run in your browser, work offline and keep your data on your own device. No accounts, no servers, nothing to sign up for.</p>
     <nav class="links" aria-label="Elsewhere">
       <a href="https://github.com/adu21-8">GitHub</a>
       <a href="https://aether-trade.netlify.app/">Aether web app</a>
@@ -184,6 +165,9 @@
           <li>Discipline-adjusted equity curve: your account if you had skipped every rule-breaking trade</li>
           <li>R-multiple distribution, weekday × hour heatmap, drawdown episodes, journal and pre-trade checklist</li>
         </ul>
+        <a class="shot" href="https://aether-trade.netlify.app/" aria-label="Open Aether">
+          <img src="assets/aether-insights.jpg" alt="Aether insights page with an R-multiple distribution chart and net P&amp;L by instrument, using sample data" width="800" height="502" loading="lazy">
+        </a>
         <div class="tags"><span>HTML / CSS / JS</span><span>PWA</span><span>Offline-first</span><span>No dependencies</span></div>
         <div class="actions">
           <a class="btn primary" href="https://aether-trade.netlify.app/">Open the app</a>
@@ -191,40 +175,6 @@
         </div>
       </div>
     </article>
-
-    <article class="item">
-      <div class="ticket">#002</div>
-      <div class="body">
-        <div class="row">
-          <h2>Desktop Widgets</h2>
-          <div class="meta"><span>opened 2026-10-23</span><span class="status idle">Private</span></div>
-        </div>
-        <p>A transparent, click-through widget overlay for Windows that sits on top of a Wallpaper Engine wallpaper. Clock, CPU and GPU gauges, weather, an app launcher, now-playing controls, and one-click audio and resolution switching.</p>
-        <div class="tags"><span>Electron</span><span>PowerShell</span><span>Windows</span></div>
-      </div>
-    </article>
-
-    <article class="item">
-      <div class="ticket">#003</div>
-      <div class="body">
-        <div class="row">
-          <h2>Orrery</h2>
-          <div class="meta"><span>opened 2026-11-11</span><span class="status live">Playable</span></div>
-        </div>
-        <p>A solar system you can play. Each planet rings a note when it crosses the meridian, and orbit speeds follow Kepler's third law, so the rhythms drift and almost never repeat. Switch to resonant orbits to make them loop.</p>
-        <a class="orrery-tile" href="orrery/" aria-label="Open Orrery">
-          <canvas id="mini" aria-hidden="true"></canvas>
-          <span class="play">▶ Play Orrery</span>
-        </a>
-        <div class="tags"><span>Web Audio</span><span>Canvas</span><span>Generative music</span></div>
-      </div>
-    </article>
-
-    <div class="totals" aria-label="Summary">
-      <div><span class="eyebrow">Projects</span><b>3</b></div>
-      <div><span class="eyebrow">Live</span><b>2</b></div>
-      <div><span class="eyebrow">Accounts needed</span><b>0</b></div>
-    </div>
   </section>
 
   <footer>
@@ -233,38 +183,5 @@
   </footer>
 </main>
 
-<script>
-  // Small ambient preview of Orrery: planets orbiting, no sound.
-  (() => {
-    const c = document.getElementById('mini'); if (!c) return;
-    const ctx = c.getContext('2d');
-    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hues = ['#f4cd75','#f2a46c','#ea7a8c','#cf82d9','#9a8ff2','#6aaeea','#5ec8c0','#a5d68c'];
-    const planets = [[0,.1],[2,.55],[3,.3],[5,.8],[7,.05],[4,.7]].map(([r,p]) => ({ r, p }));
-    let w = 0, h = 0;
-    function size() {
-      const d = Math.min(devicePixelRatio || 1, 2), b = c.getBoundingClientRect();
-      w = b.width; h = b.height; c.width = w * d; c.height = h * d; ctx.setTransform(d, 0, 0, d, 0, 0);
-    }
-    let last = performance.now();
-    function tick(now) {
-      const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      const cx = w * 0.62, cy = h * 0.5, max = h * 0.46, r0 = max * 0.2, gap = (max - r0) / 7;
-      ctx.fillStyle = '#0a0c19'; ctx.fillRect(0, 0, w, h);
-      for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.arc(cx, cy, r0 + i * gap, 0, 6.283); ctx.strokeStyle = 'rgba(214,170,85,0.16)'; ctx.lineWidth = 1; ctx.stroke(); }
-      ctx.strokeStyle = 'rgba(214,170,85,0.7)'; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, cy - max - 6); ctx.stroke();
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r0 * 1.4); g.addColorStop(0, '#ffe7b0'); g.addColorStop(1, 'rgba(240,180,80,0)');
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r0 * 1.4, 0, 6.283); ctx.fill();
-      for (const pl of planets) {
-        if (!still) pl.p = (pl.p + dt / (2.4 * Math.pow(1 + pl.r * 0.45, 1.5))) % 1;
-        const a = -Math.PI / 2 + pl.p * 6.283, R = r0 + pl.r * gap;
-        ctx.fillStyle = hues[pl.r]; ctx.beginPath(); ctx.arc(cx + Math.cos(a) * R, cy + Math.sin(a) * R, 3.5 + pl.r * 0.3, 0, 6.283); ctx.fill();
-      }
-      if (!still) requestAnimationFrame(tick);
-    }
-    size(); addEventListener('resize', () => { size(); if (still) tick(performance.now()); });
-    requestAnimationFrame(t => { last = t; tick(t); });
-  })();
-</script>
 </body>
 </html>
